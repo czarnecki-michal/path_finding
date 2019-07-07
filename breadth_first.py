@@ -15,13 +15,6 @@ grid_input = [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
               [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]]
 
-# grid_input = [[0, 0, 0, 0],
-#               [0, 0, 0, 0],
-#               [0, 0, 0, 0],
-#               [0, 0, 0, 0],
-#               [0, 0, 1, 1]] 
-
-
 class Graph:
     def __init__(self, graph):
         self.graph = graph
@@ -48,59 +41,65 @@ class Graph:
             print(row)
         print("\n")
 
-def breadth_first(graph, start, goal):
-    frontier = queue.Queue()
-    frontier.put(start )
-    came_from = {}
-    came_from[start] = None
 
-    while not frontier.empty():
-        current = frontier.get()
+class BreadthFirst:
+    def __init__(self, graph):
+        self.graph = graph
+        self.path = []
 
-        if current == goal:
-            break
+    def solve(self, start=(0,0), goal=(0,0)):
+        frontier = queue.Queue()
+        frontier.put(start )
+        came_from = {}
+        came_from[start] = None
 
-        for next in graph.neighbors(current):
-            if next not in came_from:
-                frontier.put(next)
-                came_from[next] = current
-    
-    return came_from
+        while not frontier.empty():
+            current = frontier.get()
 
-def reconstruct_path(came_from, start, goal):   
-    current = goal
-    path = []
-    while current != start:
-        path.append(current)
-        current = came_from[current]
-    path.append(start)
-    path.reverse()
+            if current == goal:
+                break
 
-    return path
+            for next in graph.neighbors(current):
+                if next not in came_from:
+                    frontier.put(next)
+                    came_from[next] = current
+        
+        self. path = self.reconstruct_path(came_from, start, goal)
 
-def print_grid(grid, path):
-    grid1 = grid.graph[:]
-    try:
-        for list in grid1:
-            for i, x in enumerate(list):
-                if x == 1:
-                    list[i] = "■"
-                if x == 0:
-                    list[i] = " "
-        for x, y in path:
-            grid1[x][y] = "·"
-        start_x, start_y = path[0]
-        goal_x, goal_y = path[-1]
-        grid1[start_x][start_y] = "A"
-        grid1[goal_x][goal_y] = "B"
-        for i in grid1:
-            print(" ".join(i))
-    except:
-        print("Brak przejścia")
+    def reconstruct_path(self, came_from, start, goal):   
+        current = goal
+        path = []
+        while current != start:
+            path.append(current)
+            current = came_from[current]
+        path.append(start)
+        path.reverse()
+
+        return path
+
+    def show(self):
+        grid1 = self.graph.graph[:]
+        path = self.path
+        try:
+            for list in grid1:
+                for i, x in enumerate(list):
+                    if x == 1:
+                        list[i] = "■"
+                    if x == 0:
+                        list[i] = " "
+            for x, y in path:
+                grid1[x][y] = "·"
+            start_x, start_y = path[0]
+            goal_x, goal_y = path[-1]
+            grid1[start_x][start_y] = "A"
+            grid1[goal_x][goal_y] = "B"
+            for i in grid1:
+                print(" ".join(i))
+        except:
+            print("Brak przejścia")
 
 
 graph = Graph(grid_input)
-came_from = breadth_first(graph, (0,0), (12,12))
-path = reconstruct_path(came_from, (0,0), (12,12))
-
-print_grid(graph, path)
+pathfinder = BreadthFirst(graph)
+pathfinder.solve(start=(0,0), goal=(12,12))
+pathfinder.show()
