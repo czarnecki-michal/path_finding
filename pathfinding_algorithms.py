@@ -64,6 +64,25 @@ class BreadthFirst(Pathfinder):
         
         self.path = self.reconstruct_path(came_from, start, goal)
 
+class GreedyBFS(Pathfinder):
+    def solve(self, start=(0,0), goal=(0,0)):
+        frontier = PriorityQueue()
+        frontier.put(start, 0)
+        came_from = {}
+        came_from[start] = None
+
+        while not frontier.empty():
+            current = frontier.get()
+            if current == goal:
+                break        
+            for next in self.grid.neighbors(current):
+                if next not in came_from:
+                    priority = self.calculate_distance(goal, next)
+                    frontier.put(next, priority)
+                    came_from[next] = current
+
+        self.path = self.reconstruct_path(came_from, start, goal)
+
 class Dijkstra(Pathfinder):
     def solve(self, start=(0,0), goal=(0,0)):
         frontier = PriorityQueue()
@@ -87,23 +106,28 @@ class Dijkstra(Pathfinder):
         
         self.path = self.reconstruct_path(came_from, start, goal)
 
-class GreedyBFS(Pathfinder):
+class Astar(Pathfinder):
     def solve(self, start=(0,0), goal=(0,0)):
         frontier = PriorityQueue()
         frontier.put(start, 0)
         came_from = {}
+        cost = {}
         came_from[start] = None
+        cost[start] = 0
 
         while not frontier.empty():
             current = frontier.get()
             if current == goal:
-                break        
+                break
             for next in self.grid.neighbors(current):
-                if next not in came_from:
-                    priority = self.calculate_distance(goal, next)
+                new_cost = cost[current] + self.grid.cost(current, next)
+                if next not in cost or new_cost < cost[next]:
+                    cost[next] = new_cost
+                    priority = new_cost + self.calculate_distance(goal, next)
                     frontier.put(next, priority)
                     came_from[next] = current
 
-        self.path = self.reconstruct_path(came_from, start, goal)
+        self.path = self.reconstruct_path(came_from, start, goal)        
+
         
             
