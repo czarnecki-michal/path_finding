@@ -30,13 +30,13 @@ class Pathfinder:
             for list in grid1:
                 for i, x in enumerate(list):
                     if x == 1:
-                        list[i] = "░"
+                        list[i] = "□"
                     if x == 2:
-                        list[i] = "▒"
+                        list[i] = "▥"
                     if x == 0:
                         list[i] = " "
                     if x == 3:
-                        list[i] = "▓"
+                        list[i] = "▦"
             start_x, start_y = self.path[0]
             goal_x, goal_y = self.path[-1]
             grid1[start_x][start_y] = "A"
@@ -48,13 +48,13 @@ class Pathfinder:
 
 class BreadthFirst(Pathfinder):
     def solve(self, start=(0,0), goal=(0,0)):
-        frontier = Queue()
+        frontier = Queue() #a ring expanding in all directions
         frontier.put(start)
-        came_from = {}
+        came_from = {} #visited nodes
         came_from[start] = None
 
         while not frontier.empty():
-            current = frontier.get()
+            current = frontier.get() #gets current node and removes it from frontier
             if current == goal:
                 break
             for next in self.grid.neighbors(current):
@@ -97,7 +97,7 @@ class Dijkstra(Pathfinder):
             if current == goal:
                 break
             for next in self.grid.neighbors(current):
-                new_cost = cost[current] + self.grid.cost(current, next)
+                new_cost = cost[current] + self.grid.cost(next)
                 if next not in cost or new_cost < cost[next]:
                     cost[next] = new_cost
                     priority = new_cost
@@ -120,7 +120,7 @@ class Astar(Pathfinder):
             if current == goal:
                 break
             for next in self.grid.neighbors(current):
-                new_cost = cost[current] + self.grid.cost(current, next)
+                new_cost = cost[current] + self.grid.cost(next)
                 if next not in cost or new_cost < cost[next]:
                     cost[next] = new_cost
                     priority = new_cost + self.calculate_distance(goal, next)
