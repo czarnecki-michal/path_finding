@@ -17,10 +17,16 @@ class Grid:
         for i, j in relative_neighbors:
             neighbor = location[0] + i, location[1] + j
             if 0 <= neighbor[0] < self.size()[0] and 0 <= neighbor[1] < self.size()[1]: #to neighbors list are added only nodes which fit in bounding box of input grid
-                neighbors.append(neighbor)
+                if self.passable(neighbor) == neighbor:
+                    neighbors.append(neighbor)
         return neighbors
 
     def cost(self, to_node):
         '''Returns cost of movement to node'''
 
-        return self.grid[to_node[0]][to_node[1]]
+        return self.grid[to_node[0]][to_node[1]]+1
+    
+    def passable(self, node):
+        '''Checks if specified node is not a wall'''
+        if self.grid[node[0]][node[1]] != 2:
+            return node
