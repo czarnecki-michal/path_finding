@@ -30,12 +30,10 @@ class Pathfinder:
             for list in grid1:
                 for i, x in enumerate(list):
                     if x == 1:
-                        list[i] = "□"
-                    if x == 2:
                         list[i] = "▥"
                     if x == 0:
                         list[i] = " "
-                    if x == 3:
+                    if x == 2:
                         list[i] = "▦"
             start_x, start_y = self.path[0]
             goal_x, goal_y = self.path[-1]
@@ -50,46 +48,48 @@ class BreadthFirst(Pathfinder):
     def solve(self, start=(0,0), goal=(0,0)):
         frontier = Queue() #a ring expanding in all directions
         frontier.put(start)
-        came_from = {} #visited nodes
-        came_from[start] = None
+        visited = {} #visited nodes
+        visited[start] = None
 
         while not frontier.empty():
             current = frontier.get() #gets current node and removes it from frontier
             if current == goal:
                 break
             for next in self.grid.neighbors(current):
-                if next not in came_from:
+                if next not in visited:
                     frontier.put(next)
-                    came_from[next] = current
+                    visited[next] = current
         
-        self.path = self.reconstruct_path(came_from, start, goal)
+        self.path = self.reconstruct_path(visited, start, goal)
+        return self.path
 
 class GreedyBFS(Pathfinder):
     def solve(self, start=(0,0), goal=(0,0)):
         frontier = PriorityQueue()
         frontier.put(start, 0)
-        came_from = {}
-        came_from[start] = None
+        visited = {}
+        visited[start] = None
 
         while not frontier.empty():
             current = frontier.get()
             if current == goal:
                 break        
             for next in self.grid.neighbors(current):
-                if next not in came_from:
+                if next not in visited:
                     priority = self.calculate_distance(goal, next)
                     frontier.put(next, priority)
-                    came_from[next] = current
+                    visited[next] = current
 
-        self.path = self.reconstruct_path(came_from, start, goal)
+        self.path = self.reconstruct_path(visited, start, goal)
+        return self.path
 
 class Dijkstra(Pathfinder):
     def solve(self, start=(0,0), goal=(0,0)):
         frontier = PriorityQueue()
         frontier.put(start, 0)
-        came_from = {}
+        visited = {}
         cost = {}
-        came_from[start] = None
+        visited[start] = None
         cost[start] = 0
 
         while not frontier.empty():
@@ -102,17 +102,18 @@ class Dijkstra(Pathfinder):
                     cost[next] = new_cost
                     priority = new_cost
                     frontier.put(next, priority)
-                    came_from[next] = current
-        
-        self.path = self.reconstruct_path(came_from, start, goal)
+                    visited[next] = current
+
+        self.path = self.reconstruct_path(visited, start, goal)
+        return self.path
 
 class Astar(Pathfinder):
     def solve(self, start=(0,0), goal=(0,0)):
         frontier = PriorityQueue()
         frontier.put(start, 0)
-        came_from = {}
+        visited = {}
         cost = {}
-        came_from[start] = None
+        visited[start] = None
         cost[start] = 0
 
         while not frontier.empty():
@@ -125,9 +126,10 @@ class Astar(Pathfinder):
                     cost[next] = new_cost
                     priority = new_cost + self.calculate_distance(goal, next)
                     frontier.put(next, priority)
-                    came_from[next] = current
-
-        self.path = self.reconstruct_path(came_from, start, goal)        
+                    visited[next] = current
+                    
+        self.path = self.reconstruct_path(visited, start, goal)        
+        return self.path
 
         
             
